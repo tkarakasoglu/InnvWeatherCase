@@ -1,0 +1,11 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/networking_category">
+
+        <SwitchPreferenceCompat
+            app:key="@string/gps"
+            app:title="@string/gps" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

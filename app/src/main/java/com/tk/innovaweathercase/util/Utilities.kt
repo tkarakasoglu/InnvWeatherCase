@@ -2,10 +2,8 @@ package com.tk.innovaweathercase.util
 
 import android.Manifest
 import android.content.Context
-import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import com.permissionx.guolindev.PermissionX
@@ -41,10 +39,6 @@ class Utilities {
                 }
         }
 
-        fun checkLocationRuntimePermission(context: Context): Boolean {
-            return PermissionX.isGranted(context, Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-
         fun isAppGPSEnabled(context: Context): Boolean {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -56,13 +50,6 @@ class Utilities {
             }
 
             return sharedPreferences.getBoolean(context.getString(R.string.gps), true)
-        }
-
-        fun isSystemGPSEnabled(context: Context): Boolean {
-            val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER
-            )
         }
     }
 }

@@ -33,9 +33,8 @@ class WeatherActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createViewModel()
+        initViewModel()
         initUI()
-        checkAppGPSEnabled()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -43,10 +42,17 @@ class WeatherActivity : AppCompatActivity() {
         return navController.navigateUp()
     }
 
-    private fun createViewModel() {
+    private fun initViewModel() {
         val weatherRepository = WeatherRepository(this, WeatherDatabase(this))
-        val viewModelProviderFactory = WeatherViewModelFactory(weatherRepository)
+        val viewModelProviderFactory = WeatherViewModelFactory(application, weatherRepository)
         weatherViewModel = ViewModelProvider(this, viewModelProviderFactory)[WeatherViewModel::class.java]
+        weatherViewModel.isAppGPSEnabledLiveData.observe(this) { response ->
+            if (response) {
+                handleLocation()
+            } else {
+                resetCurrentCity()
+            }
+        }
     }
 
     private fun initUI() {
@@ -65,25 +71,14 @@ class WeatherActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    private fun checkAppGPSEnabled() {
-        if (Utilities.isAppGPSEnabled(this)) {
-            initLocationPermission()
-        }
-    }
-
-    fun initLocationPermission(): Boolean {
-        val isLocationPermitted = Utilities.checkLocationRuntimePermission(this)
-        if (isLocationPermitted) {
-            getCurrentCity()
-        } else {
-            Utilities.requestLocationRuntimePermission(this) { allGranted, grantedList, deniedList ->
-                if (allGranted) {
-                    getCurrentCity()
-                }
+    private fun handleLocation() {
+        Utilities.requestLocationRuntimePermission(this) { allGranted, grantedList, deniedList ->
+            if (allGranted) {
+                getCurrentCity()
+            } else {
+                resetCurrentCity()
             }
         }
-
-        return isLocationPermitted
     }
 
     @SuppressLint("MissingPermission")
@@ -101,19 +96,29 @@ class WeatherActivity : AppCompatActivity() {
                     geoCoder.getFromLocation(location.latitude,location.longitude,3) {addressList ->
                         if (addressList.size > 0) {
                             setCurrentCityFromName(addressList[0].adminArea)
+                        } else {
+                            resetCurrentCity()
                         }
                     }
                 } else {
                     val addressList = geoCoder.getFromLocation(location.latitude,location.longitude,3)
                     if (addressList != null && addressList.size > 0) {
                         setCurrentCityFromName(addressList[0].adminArea)
+                    } else {
+                        resetCurrentCity()
                     }
                 }
             }
+        }.addOnFailureListener {
+            resetCurrentCity()
         }
     }
 
     private fun setCurrentCityFromName(cityName: String) {
         weatherViewModel.setCurrentCityFromName(cityName)
+    }
+
+    private fun resetCurrentCity() {
+        weatherViewModel.resetCurrentCity()
     }
 }

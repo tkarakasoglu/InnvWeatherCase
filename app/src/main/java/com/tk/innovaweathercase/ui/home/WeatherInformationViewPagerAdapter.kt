@@ -15,8 +15,14 @@ class WeatherInformationViewPagerAdapter(fragment: Fragment) : FragmentStateAdap
         return cityMutableList.size
     }
 
+    override fun getItemId(position: Int): Long {
+        return cityMutableList[position].geonameId.toLong()
+    }
+    override fun containsItem(itemId: Long): Boolean = cityMutableList.any { it.geonameId.toLong() == itemId }
+
     @SuppressLint("NotifyDataSetChanged")
     fun setCityMutableList(cityList: List<City>) {
+
         cityMutableList = cityList.toMutableList()
         notifyDataSetChanged()
     }

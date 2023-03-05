@@ -1,27 +1,32 @@
 package com.tk.innovaweathercase.ui
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tk.innovaweathercase.data.model.City
 import com.tk.innovaweathercase.data.model.WeatherAPIResponse
 import com.tk.innovaweathercase.data.repository.WeatherRepository
 import com.tk.innovaweathercase.util.Constants
+import com.tk.innovaweathercase.util.Utilities
 import kotlinx.coroutines.launch
 
 class WeatherViewModel(
+    private val app: Application,
     private val weatherRepository: WeatherRepository
-): ViewModel() {
+): AndroidViewModel(app) {
 
     val cityListMutableLiveData = MutableLiveData<List<City>>()
     val cityFavoritesMutableLiveData = MutableLiveData<List<City>>()
     val weatherMutableLiveDataHashMap = HashMap<Int, MutableLiveData<WeatherAPIResponse>>()
+    val isAppGPSEnabledLiveData = MutableLiveData<Boolean>()
 
     init {
-        getCityList()
+        setup()
     }
 
-    private fun getCityList() = viewModelScope.launch {
+    private fun setup() = viewModelScope.launch {
+        // Get City list online
         val cityList = weatherRepository.getLiveCityList()
 
         // Add MutableLiveData for cities
@@ -31,7 +36,8 @@ class WeatherViewModel(
 
         cityListMutableLiveData.postValue(cityList)
 
-        updateCityFavoritesList()
+        // Set app GPS
+        isAppGPSEnabledLiveData.postValue(Utilities.isAppGPSEnabled(app))
     }
 
     fun setCityFavorites(city: City, isFav: Boolean) = viewModelScope.launch {
@@ -60,12 +66,19 @@ class WeatherViewModel(
         updateCityFavoritesList()
     }
 
+    fun setAppGPSEnabled(enabled: Boolean) = viewModelScope.launch {
+        isAppGPSEnabledLiveData.postValue(enabled)
+    }
+
     fun getWeatherInformation(city: City) = viewModelScope.launch {
         val weatherAPIResponse = weatherRepository.getWeatherInformation(city.lat, city.lng)
         weatherMutableLiveDataHashMap[city.geonameId]?.postValue(weatherAPIResponse)
     }
 
     private suspend fun updateCityFavoritesList() {
+        // Clear list
+        cityFavoritesMutableLiveData.postValue(listOf())
+
         val cityFavoritesList = weatherRepository.getCityFavoritesList()
 
         // If there is no favorites, add İzmir instead

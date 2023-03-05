@@ -10,4 +10,5 @@
     <string name="feels_like">feels like</string>
     <string name="pressure">pressure</string>
     <string name="humidity">humidity</string>
+    <string name="searching_for_location">Searching for location…</string>
 </resources>

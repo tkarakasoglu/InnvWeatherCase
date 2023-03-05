@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -67,6 +68,7 @@ class WeatherActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_settings
             )
         )
+        setSupportActionBar(binding.toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
@@ -84,6 +86,7 @@ class WeatherActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun getCurrentCity() {
         // Get current location
+        setSearchingForLocationTextViewVisible(true)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
             override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
@@ -114,11 +117,19 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
+    private fun setSearchingForLocationTextViewVisible(visible: Boolean) {
+        runOnUiThread {
+            binding.searchingForLocationTextView.visibility = if (visible) View.VISIBLE else View.GONE
+        }
+    }
+
     private fun setCurrentCityFromName(cityName: String) {
+        setSearchingForLocationTextViewVisible(false)
         weatherViewModel.setCurrentCityFromName(cityName)
     }
 
     private fun resetCurrentCity() {
+        setSearchingForLocationTextViewVisible(false)
         weatherViewModel.resetCurrentCity()
     }
 }

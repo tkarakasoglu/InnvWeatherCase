@@ -16,7 +16,7 @@ interface WeatherDAO {
     @Query("SELECT * FROM $WEATHER_DATABASE_CITY_TABLE ORDER BY isFav DESC, toponymName")
     suspend fun getCityList(): List<City>
 
-    @Query("SELECT * FROM $WEATHER_DATABASE_CITY_TABLE WHERE isCurrent OR isFav")
+    @Query("SELECT * FROM $WEATHER_DATABASE_CITY_TABLE WHERE isCurrent OR isFav ORDER BY isCurrent DESC")
     suspend fun getCityFavoritesList(): List<City>
 
     @Query("SELECT * FROM $WEATHER_DATABASE_CITY_TABLE  WHERE toponymName = :cityName")

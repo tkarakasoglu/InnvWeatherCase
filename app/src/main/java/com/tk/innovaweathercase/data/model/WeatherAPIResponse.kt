@@ -1,5 +1,5 @@
 package com.tk.innovaweathercase.data.model
 
 data class WeatherAPIResponse(
-    val main: WeatherInformation
+    val main: WeatherInformation = WeatherInformation()
 )

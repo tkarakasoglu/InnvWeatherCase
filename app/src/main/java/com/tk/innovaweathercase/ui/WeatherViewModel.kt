@@ -37,7 +37,7 @@ class WeatherViewModel(
         cityListMutableLiveData.postValue(cityList)
 
         // Set app GPS
-        isAppGPSEnabledLiveData.postValue(Utilities.isAppGPSEnabled(app))
+        isAppGPSEnabledLiveData.postValue(Utilities.checkAppGPSAndEnableForFistRun(app))
     }
 
     fun setCityFavorites(city: City, isFav: Boolean) = viewModelScope.launch {

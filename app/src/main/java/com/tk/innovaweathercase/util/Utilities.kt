@@ -39,7 +39,7 @@ class Utilities {
                 }
         }
 
-        fun isAppGPSEnabled(context: Context): Boolean {
+        fun checkAppGPSAndEnableForFistRun(context: Context): Boolean {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
             // Initially GPS is on if not set

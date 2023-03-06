@@ -83,7 +83,12 @@ class WeatherViewModel(
 
         // If there is no favorites, add İzmir instead
         val cityList = cityFavoritesList.ifEmpty {
-            listOf(weatherRepository.getCityFromName(Constants.DEFAULT_CITY))
+            val cityDefault = weatherRepository.getCityFromName(Constants.DEFAULT_CITY)
+            if (cityDefault != null) {
+                listOf(cityDefault)
+            } else {
+                listOf()
+            }
         }
 
         cityFavoritesMutableLiveData.postValue(cityList)
